@@ -27,12 +27,12 @@ public class CaltotpremTest {
 	}
 	
 	/**
-	 * ¿¹»óÃÑº¸Çè±İÁ¶È¸
+	 * ì˜ˆì‚°ì´ë³´í—˜ê¸ˆ ì¡°íšŒ
 	 * 
-	 * @param prdtInfo	»óÇ°Á¤º¸
-	 * @param insCvr	°è¾à´ãº¸Á¤º¸
-	 * @param contInfo	°è¾àÁ¤º¸ Áß ÇÑ°¡Áö
-	 * @return ContMst	°è¾àÁ¤º¸
+	 * @param prdtInfo	ìƒí’ˆì •ë³´
+	 * @param insCvr	ê³„ì•½ë‹´ë³´ì •ë³´
+	 * @param contPrd	ê³„ì•½ê¸°ê°„
+	 * @return ContMst	ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	 */
 	@Test
 	void dlngContMstTest() throws Exception{

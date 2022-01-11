@@ -15,6 +15,7 @@ import com.hhc.kakaopayins.global.entity.CvrInfo;
 import com.hhc.kakaopayins.global.exception.ErrCode;
 import com.hhc.kakaopayins.global.exception.KakaoException;
 import com.hhc.kakaopayins.global.util.CalculationUtil;
+import com.hhc.kakaopayins.global.util.ValidationUtil;
 import com.hhc.kakaopayins.makecont.repository.ContNoInfoRepository;
 import com.hhc.kakaopayins.makecont.repository.CvrInfoRepository;
 import com.hhc.kakaopayins.makecont.repository.MakeContRepository;
@@ -22,7 +23,6 @@ import com.hhc.kakaopayins.makecont.repository.MakeContRepository;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
-@Transactional
 @Slf4j
 public class MakeContServiceImpl implements MakeContService{
 	
@@ -38,6 +38,7 @@ public class MakeContServiceImpl implements MakeContService{
 	}
 
 	@Override
+	@Transactional
 	public ContMst saveContMst(ContMst contMst){
 		/*
 		int idx = contNoInfoRepo.findMaxValue()+1;
@@ -46,21 +47,23 @@ public class MakeContServiceImpl implements MakeContService{
 		contNoInfoRepo.updateValue(idx);
 		*/
 		
+		ValidationUtil.chkDupCvrInfo(contMst.getInsCvr());	//ì¤‘ë³µì…ë ¥ì—¬ë¶€ ì²´í¬
+		
 		int idx = contNoInfoRepo.findNextSeq();
 		String idxStr = String.format("%05d", idx);
 		
-		//ÇöÀçÀÏÀÚ
+		//í˜„ì¬ì¼ì
 		SimpleDateFormat format = new SimpleDateFormat ( "yyyyMMdd");
 		String dateFormat = format.format(new Date());
 		
-		//°è¾à½ÃÀÛÀÏ -> ÇöÀçÀÏÀÚ + 1ÀÏ
+		//ê³„ì•½ì‹œì‘ì¼ -> í˜„ì¬ì¼ì + 1ì¼
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(new Date());
 		cal.add(Calendar.DATE, 1);
 		String insStdt = format.format(cal.getTime());
 		
 		
-		//°è¾àÁ¾·áÀÏ
+		//ê³„ì•½ì¢…ë£Œì¼
 		cal.add(Calendar.MONTH, contMst.getContPrd());
 		cal.add(Calendar.DATE, -1);
 		String insEndDt	= format.format(cal.getTime());
@@ -70,19 +73,37 @@ public class MakeContServiceImpl implements MakeContService{
 		
 		
 		List<CvrInfo> cvrInfoList = cvrInfoRepository.findPrdtInfo(contMst.getPrdtInfo());
-		if(cvrInfoList == null) {
-			throw new KakaoException(ErrCode.E1000.getErrMsg(), ErrCode.E1000);
+		ValidationUtil.chkContPrd(cvrInfoList, contMst.getContPrd());
+		
+		
+		
+		//ì´ë³´í—˜ë£Œ ê³„ì‚°
+		BigDecimal totInsPrem = CalculationUtil.calTotInsPrem(contMst.getPrdtInfo(), contMst.getInsCvr(), contMst.getContPrd(), cvrInfoRepository);
+		
+		contMst.setContNo("P"+dateFormat+idxStr);				//ê³„ì•½ë²ˆí˜¸ -> í˜„ì¬ë‚ ì§œ + ì‹œí€€ìŠ¤
+		contMst.setPrdtInfo(contMst.getPrdtInfo());		//ìƒí’ˆì •ë³´ -> ì…ë ¥ê°’
+		contMst.setInsCvr(contMst.getInsCvr());			//ê°€ì…ë‹´ë³´ -> ì…ë ¥ê°’
+		contMst.setContPrd(contMst.getContPrd());			//ê³„ì•½ê¸°ê°„ -> ì…ë ¥ê°’
+		contMst.setTotInsPrem(totInsPrem);	//ì´ë³´í—˜ë£Œ -> ë‹´ë³´ì— ë”°ë¼ ê³„ì‚°ëœ ê°’ ì…‹íŒ…
+		contMst.setContStat("ì •ìƒê³„ì•½");		//ê³„ì•½ìƒíƒœ
+		
+		try {
+			
+			contMst.setInsStdt(format.parse(insStdt + "000000"));	//ë³´í—˜ì‹œì‘ì¼ -> ê³„ì•½ì¼+1
+			contMst.setInsEnddt(format.parse(insEndDt + "235959"));	//ë³´í—˜ì¢…ë£Œì¼ -> ë³´í—˜ì‹œì‘ì¼*ê³„ì•½ê¸°ê°„(ì›”)
+			
+		}catch (Exception e) {
+			
+			throw new KakaoException("ì˜ˆìƒì¹˜ ëª»í•œ ì˜¤ë¥˜ ë°œìƒ", ErrCode.E0002);
 		}
 		
+		log.info("ì €ì¥ê°’ í™•ì¸>>>>> "+contMst);
 		
-		//°è¾à±â°£ Ã¼Å©
-		int minContPrd = cvrInfoList.get(0).getPrdtInfo().getMinContPrd();
-		int maxContPrd = cvrInfoList.get(0).getPrdtInfo().getMaxContPrd();
-		if(minContPrd > contMst.getContPrd() || contMst.getContPrd() > maxContPrd) {
-			throw new KakaoException(ErrCode.E1001.getErrMsg(), ErrCode.E1001);	//ÇØ´ç »óÇ°¿¡ °è¾à±â°£À» È®ÀÎ¹Ù¶ø´Ï´Ù.
-		}
+		//ê³„ì•½ìƒì„±
+		repository.save(contMst);
 		
-		//¸®ÅÏ °ª¿¡´Â ÄÚµå°¡ ¾Æ´Ñ ¸íÄªÀ¸·Î º¯°æ
+		
+		//ë¦¬í„´ ê°’ì—ëŠ” ì½”ë“œê°€ ì•„ë‹Œ ì½”ë“œëª…ì¹­ìœ¼ë¡œ ë³€ê²½
 		String[] cvrArr = contMst.getInsCvr().split(",");
 		StringBuffer sb = new StringBuffer();
 		for(String cvr : cvrArr) {
@@ -93,30 +114,8 @@ public class MakeContServiceImpl implements MakeContService{
 			}
 		}
 		
-		//ÃÑº¸Çè·á°è»ê
-		BigDecimal totInsPrem = CalculationUtil.calTotInsPrem(contMst.getPrdtInfo(), contMst.getInsCvr(), contMst.getContPrd(), cvrInfoRepository);
-		
-		contMst.setContNo("P"+dateFormat+idxStr);				//°è¾à¹øÈ£	-> ÇöÀç³¯Â¥ + ½ÃÄö½º
-		contMst.setPrdtInfo(cvrInfoList.get(0).getPrdtInfo().getPrdtNm());		//»óÇ°Á¤º¸	-> ÀÔ·Â°ª 
-		contMst.setInsCvr(sb.toString().substring(0, sb.toString().length()-1));			//°¡ÀÔ´ãº¸ -> ÀÔ·Â°ª
-		contMst.setContPrd(contMst.getContPrd());			//°è¾à±â°£ -> ÀÔ·Â°ª
-		contMst.setTotInsPrem(totInsPrem);	//ÃÑº¸Çè·á -> ´ãº¸¿¡ µû¸¥ °ª ¼ÂÆÃ
-		contMst.setContStat("Á¤»ó°è¾à");		//°è¿ª»óÅÂ
-		
-		try {
-			
-			contMst.setInsStdt(format.parse(insStdt + "000000"));	//º¸Çè½ÃÀÛÀÏ -> °è¾àÀÏ+1
-			contMst.setInsEnddt(format.parse(insEndDt + "235959"));	//º¸ÇèÁ¾·áÀÏ -> º¸Çè½ÃÀÛÀÏ + (ContPrd + Month)
-			
-		}catch (Exception e) {
-			
-			throw new KakaoException("¿¹»óÄ¡ ¸øÇÑ ¿À·ù ¹ß»ı.", ErrCode.E0002);
-		}
-		
-		log.info("ÀúÀå°ª È®ÀÎ >>>>> "+contMst);
-		
-		//°è¾à»ı¼º
-		repository.save(contMst);
+		contMst.setPrdtInfo(cvrInfoList.get(0).getPrdtInfo().getPrdtNm());		//ìƒí’ˆì •ë³´ -> ì…ë ¥ê°’
+		contMst.setInsCvr(sb.toString().substring(0, sb.toString().length()-1));			//ê°€ì…ë‹´ë³´ -> ì…ë ¥ê°’
 		
 		return contMst;
 

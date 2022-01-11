@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public class KakaoException extends RuntimeException{
 	/**
-	 * ¾÷¹«Ã³¸® ¿À·ù ½Ã
+	 *  ì—…ë¬´ì²˜ë¦¬ ì˜¤ë¥˜ ì‹œ ì˜ˆì™¸ì²˜ë¦¬
 	 */
 	private static final long serialVersionUID = 1L;
 	

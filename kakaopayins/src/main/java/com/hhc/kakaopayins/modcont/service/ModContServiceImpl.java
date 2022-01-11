@@ -3,6 +3,7 @@ package com.hhc.kakaopayins.modcont.service;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import javax.transaction.Transactional;
 
@@ -13,6 +14,7 @@ import com.hhc.kakaopayins.global.entity.CvrInfo;
 import com.hhc.kakaopayins.global.exception.ErrCode;
 import com.hhc.kakaopayins.global.exception.KakaoException;
 import com.hhc.kakaopayins.global.util.CalculationUtil;
+import com.hhc.kakaopayins.global.util.ValidationUtil;
 import com.hhc.kakaopayins.makecont.repository.CvrInfoRepository;
 import com.hhc.kakaopayins.modcont.repository.ModContRepository;
 
@@ -29,14 +31,16 @@ public class ModContServiceImpl implements ModContService {
 	}
 	
 	/**
-	 * ´ãº¸¼öÁ¤ -> ´ãº¸¼öÁ¤ ÈÄ ÃÑº¸Çè±İ ±İ¾×µµ ¼öÁ¤ÇÔ.
-	 * @param contNo °è¾à¹øÈ£
-	 * @param insCvr º¸Çè´ãº¸
+	 * ë‹´ë³´ìˆ˜ì • -> ë‹´ë³´ìˆ˜ì • í›„ ì´ë³´í—˜ê¸ˆë„ ìˆ˜ì •í•¨.
+	 * @param contNo ê³„ì•½ë²ˆí˜¸
+	 * @param insCvr ë³´í—˜ë‹´ë³´
 	 * @return ContMst
 	 */
 	@Override
-	@Transactional
 	public ContMst modInsCvr(String contNo, String insCvr) {
+		
+		ValidationUtil.chkDupCvrInfo(insCvr);	//ì¤‘ë³µì…ë ¥ì—¬ë¶€ ì²´í¬
+		
 		ContMst cm = modContRepository.findById(contNo).orElseThrow(null);
 		cm.setInsCvr(insCvr);
 		cm.setTotInsPrem(CalculationUtil.calTotInsPrem(cm.getPrdtInfo(), insCvr, cm.getContPrd(), cvrInfoRepository));
@@ -44,18 +48,22 @@ public class ModContServiceImpl implements ModContService {
 	}
 	
 	/**
-	 * °è¾à±â°£ ¼öÁ¤ -> °è¾à±â°£ ¼öÁ¤ ÈÄ º¸ÇèÁ¾·áÀÏÀÚ, ÃÑº¸Çè·áµµ ¼öÁ¤ÇÔ.
-	 * @param contNo °è¾à¹øÈ£
-	 * @param contPrd °è¾à±â°£
+	 * ê³„ì•½ê¸°ê°„ ìˆ˜ì • -> ê³„ì•½ê¸°ê°„ ìˆ˜ì • í›„ ë³´í—˜ì¢…ë£Œì¼ì, ì´ë³´í—˜ë£Œë„ ìˆ˜ì •í•¨.
+	 * @param contNo ê³„ì•½ë²ˆí˜¸
+	 * @param contPrd ê³„ì•½ê¸°ê°„
 	 * @return ContMst
 	 */
 	@Override
-	@Transactional
 	public ContMst modContPrd(String contNo, String contPrd) throws Exception {
+		
+		
 		ContMst cm = modContRepository.findById(contNo).orElseThrow(null);
 		cm.setContPrd(Integer.parseInt(contPrd));
 		
-		//°è¾à½ÃÀÛÀÏ -> ÇöÀçÀÏÀÚ + 1ÀÏ
+		List<CvrInfo> cvrInfoList = cvrInfoRepository.findPrdtInfo(cm.getPrdtInfo());
+		ValidationUtil.chkContPrd(cvrInfoList, Integer.parseInt(contPrd));
+		
+		//ê³„ì•½ì‹œì‘ì¼ -> í˜„ì¬ì¼ì + 1ì¼
 		SimpleDateFormat format = new SimpleDateFormat ( "yyyyMMdd");
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(cm.getInsStdt());
@@ -70,24 +78,23 @@ public class ModContServiceImpl implements ModContService {
 	}
 	
 	/**
-	 * °è¾à»óÅÂ ¼öÁ¤ 
-	 * @param contNo °è¾à¹øÈ£
-	 * @param contPrd °è¾à»óÅÂ
+	 * ê³„ì•½ìƒíƒœ ìˆ˜ì •
+	 * @param contNo ê³„ì•½ë²ˆí˜¸
+	 * @param contPrd ê³„ì•½ìƒíƒœ
 	 * @return ContMst
 	 */
 	@Override
-	@Transactional
 	public ContMst modContStat(String contNo, String contStat) {
 		ContMst cm = modContRepository.findById(contNo).orElseThrow(null);
-		if("±â°£¸¸·á".equals(cm.getContStat())){
-			throw new KakaoException(ErrCode.E1003.getErrMsg(), ErrCode.E1003);	//ÀÌ¹Ì °è¾à±â°£ÀÌ ¸¸·áµÈ °è¾àÀÔ´Ï´Ù.
+		if("ê¸°ê°„ë§Œë£Œ".equals(cm.getContStat())){
+			throw new KakaoException(ErrCode.E1003.getErrMsg(), ErrCode.E1003);	//ì´ë¯¸ ê¸°ê°„ì´ ë§Œë£Œëœ ê³„ì•½ì…ë‹ˆë‹¤.
 		}
 		
 	    int compare = new Date().compareTo(cm.getInsEnddt());
 	    System.out.println("compare>>>>>"+compare);
 		if(compare >= 0) {
-			//º¸ÇèÁ¾·áÀÏÀÚ°¡ Áö³µ´Ù¸é ±â°£¸¸·á·Î º»´Ù. 
-			throw new KakaoException("ÀÌ¹Ì °è¾àÀÌ Á¾·áµÈ °ÇÀÔ´Ï´Ù.", ErrCode.E1003);	
+			//ë³´í—˜ì¢…ë£Œì¼ìê°€ ì§€ë‚¬ë‹¤ë©´ ê¸°ê°„ë§Œë£Œë¡œ ë³¸ë‹¤.
+			throw new KakaoException(ErrCode.E1004.getErrMsg(), ErrCode.E1004);	//ì´ë¯¸ ê³„ì•½ì´ ì¢…ë£Œëœ ê±´ì…ë‹ˆë‹¤.
 		}
 		
 		cm.setContStat(contStat);
@@ -96,11 +103,10 @@ public class ModContServiceImpl implements ModContService {
 	
 	
 	/**
-	 * ¸®ÅÏµÇ´Â Á¤º¸¿¡ ÇÑ±Û »óÇ°¸í/´ãº¸¸í ¼ÂÆÃ
+	 * ë¦¬í„´ë˜ëŠ” ì •ë³´ì— í•œê¸€ ìƒí’ˆëª…/ë‹´ë³´ëª… ì…‹íŒ…
 	 * @param ContMst
 	 * @return ContMst
 	 */
-	@Transactional
 	public ContMst setHnglNm(ContMst contMst) {
 		
 		CvrInfo cvrInfo = null;

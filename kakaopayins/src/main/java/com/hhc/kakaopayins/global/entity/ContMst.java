@@ -12,14 +12,14 @@ import lombok.Data;
 @Entity
 public class ContMst {
 	@Id
-	private String contNo;				//°è¾à¹øÈ£
-	private String prdtInfo;		//»óÇ°Á¤º¸
-	private String insCvr;			//°¡ÀÔ´ãº¸
-	private int contPrd;			//°è¾à±â°£
+	private String contNo;				//ê³„ì•½ë²ˆí˜¸
+	private String prdtInfo;		//ìƒí’ˆì •ë³´
+	private String insCvr;			//ê°€ì…ë‹´ë³´
+	private int contPrd;			//ê³„ì•½ê¸°ê°„
 	//@Column(name = "DATE_FIELD")
-	private Date insStdt;	//º¸Çè½ÃÀÛÀÏ
+	private Date insStdt;	//ë³´í—˜ì‹œì‘ì¼
 	//@Column(name = "DATE_FIELD")
-	private Date insEnddt;	//º¸ÇèÁ¾·áÀÏ
-	private BigDecimal totInsPrem;	//ÃÑº¸Çè·á
-	private String contStat;		//°è¿ª»óÅÂ
+	private Date insEnddt;	//ë³´í—˜ì¢…ë£Œì¼
+	private BigDecimal totInsPrem;	//ì´ë³´í—˜ë£Œ
+	private String contStat;		//ê³„ì•½ìƒíƒœ
 }

@@ -11,17 +11,17 @@ import lombok.Data;
 @Data
 @Entity	
 @SequenceGenerator(
-        name="CONT_NO_SEQ_GEN", //½ÃÄö½º Á¦³Ê·¹ÀÌÅÍ ÀÌ¸§
-        sequenceName="CONT_NO_SEQ", //½ÃÄö½º ÀÌ¸§
-        initialValue=3, //½ÃÀÛ°ª
-        allocationSize=1 //¸Ş¸ğ¸®¸¦ ÅëÇØ ÇÒ´çÇÒ ¹üÀ§ »çÀÌÁî
+        name="CONT_NO_SEQ_GEN", 
+        sequenceName="CONT_NO_SEQ",
+        initialValue=3, //ì´ˆê¸° ë°ì´í„° 2ê±´ì„ ê³„ì•½í…Œì´ë¸”ì— insert ì‹œí‚¤ê¸° ë•Œë¬¸ì— 3ë¶€í„° ì‹œì‘í•¨.
+        allocationSize=1 
         )
 
 public class ContNoInfo {
 	@Id
 	@GeneratedValue(
-            strategy=GenerationType.SEQUENCE, //»ç¿ëÇÒ Àü·«À» ½ÃÄö½º·Î  ¼±ÅÃ
-            generator="CONT_NO_SEQ_GEN" //½Äº°ÀÚ »ı¼º±â¸¦ ¼³Á¤ÇØ³õÀº  USER_SEQ_GENÀ¸·Î ¼³Á¤
+            strategy=GenerationType.SEQUENCE,
+            generator="CONT_NO_SEQ_GEN" 
             )
-	private int idxNo;				//°è¾à¹øÈ£
+	private int idxNo;				//ê³„ì•½ë²ˆí˜¸
 }

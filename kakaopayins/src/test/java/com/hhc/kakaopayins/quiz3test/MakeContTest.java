@@ -27,11 +27,11 @@ public class MakeContTest {
 	}
 	
 	/**
-	 * °è¾à»ı¼º
-	 * @param prdtInfo 	»óÇ°Á¤º¸(»óÇ°ÄÚµå)
-	 * @param insCvr	´ãº¸Á¤º¸(´ãº¸ÄÚµå)
-	 * @param contPrd	°è¾à±â°£
-	 * @return °è¾àÁ¤º¸
+	 * ê³„ì•½ìƒì„±
+	 * @param prdtInfo 	ìƒí’ˆì •ë³´(ìƒí’ˆì½”ë“œ)
+	 * @param insCvr	ë‹´ë³´ì •ë³´(ë‹´ë³´ì½”ë“œ)
+	 * @param contPrd	ê³„ì•½ê¸°ê°„
+	 * @return ê³„ì•½ì •ë³´
 	 */
 	@Test
 	void makeContTest() throws Exception{

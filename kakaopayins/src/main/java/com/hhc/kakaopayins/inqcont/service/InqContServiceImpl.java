@@ -3,8 +3,6 @@ package com.hhc.kakaopayins.inqcont.service;
 import java.math.BigDecimal;
 import java.util.List;
 
-import javax.transaction.Transactional;
-
 import org.springframework.stereotype.Service;
 
 import com.hhc.kakaopayins.global.entity.ContMst;
@@ -16,7 +14,7 @@ import com.hhc.kakaopayins.inqcont.repository.ContMstRepository;
 import com.hhc.kakaopayins.makecont.repository.CvrInfoRepository;
 
 @Service
-@Transactional
+//@Transactional
 public class InqContServiceImpl implements InqContService {
 	
 	private ContMstRepository contMstRepository;
@@ -30,60 +28,61 @@ public class InqContServiceImpl implements InqContService {
 
 	@Override
 	public List<ContMst> getContMst(String contInfo) {
-
-		List<ContMst> rtn = null;
+		
+		List<ContMst> inqList = null;
 		
 		String dtForm = ValidationUtil.chkDateFormat(contInfo);
 		
 		if(dtForm != null) {
-			rtn = contMstRepository.findDateType(contInfo, dtForm);
+			inqList = contMstRepository.findDateType(contInfo, dtForm);
 		}
 		
 		if(ValidationUtil.chkNumberType(contInfo)) {
 			List<ContMst> numeric = contMstRepository.findNumberType(new BigDecimal(contInfo));
 			
-			if(rtn != null) {
+			if(inqList != null) {
 				for(ContMst add : numeric) {
-					rtn.add(add);
+					inqList.add(add);
 				}
 			}else {
-				rtn = numeric;
+				inqList = numeric;
 			}
 			
 		}
 		
 		List<ContMst> inq = contMstRepository.findVarCharType(contInfo);
-		if(rtn != null) {
+		if(inqList != null) {
 			for(ContMst add : inq) {
-				rtn.add(add);
+				inqList.add(add);
 			}
 		}else {
-			rtn = inq;
+			inqList = inq;
 		}
 		
 		
-		if(rtn.size() == 0) {
+		if(inqList.size() == 0) {
 			throw new KakaoException(ErrCode.E1002.getErrMsg(), ErrCode.E1002);
 		}
 		
-		int len = rtn.size();
+		int len = inqList.size();
+		System.out.println("1.inqList.size()>>>>>"+inqList.size());
 		for(int i = 0; i < len; i++) {
 			
+			
 			CvrInfo cvrInfo = null;
-			String[] tStr = rtn.get(i).getInsCvr().split(",");
+			String[] tStr = inqList.get(i).getInsCvr().split(",");
 			StringBuffer cvrNm = new StringBuffer();
 			for(String cvr : tStr) {
-				cvrInfo = cvrInfoRepository.findCvrInfo(cvr, rtn.get(i).getPrdtInfo());
+				cvrInfo = cvrInfoRepository.findCvrInfo(cvr, inqList.get(i).getPrdtInfo());
 				cvrNm.append(cvrInfo.getCvrNm()+",");
 			}
 			
-			rtn.get(i).setPrdtInfo(cvrInfo.getPrdtInfo().getPrdtNm());
-			rtn.get(i).setInsCvr(cvrNm.toString().substring(0, cvrNm.toString().length()-1));
+			inqList.get(i).setPrdtInfo(cvrInfo.getPrdtInfo().getPrdtNm());
+			inqList.get(i).setInsCvr(cvrNm.toString().substring(0, cvrNm.toString().length()-1));
 		}
+		System.out.println("2.inqList.size()>>>>>"+inqList.size());
 		
-		
-		
-		return rtn;
+		return inqList;
 	}
 
 }
