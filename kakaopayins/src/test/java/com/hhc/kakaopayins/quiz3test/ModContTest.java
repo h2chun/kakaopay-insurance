@@ -27,10 +27,10 @@ public class ModContTest {
 	}
 	
 	/**
-	 * ´ãº¸ Ãß°¡/»èÁ¦ µî º¯°æÇÏ±â
-	 * @param contNo 	°è¾à¹øÈ£
-	 * @param insCvr	´ãº¸Á¤º¸(´ãº¸ÄÚµå)
-	 * @return °è¾àÁ¤º¸
+	 * ë‹´ë³´ ì¶”ê°€/ì‚­ì œ ë“± ë³€ê²½í•˜ê¸°
+	 * @param contNo 	ê³„ì•½ë²ˆí˜¸
+	 * @param insCvr	ë‹´ë³´ì •ë³´(ë‹´ë³´ì½”ë“œ)
+	 * @return ê³„ì•½ì •ë³´
 	 */
 	@Test
 	void postInsCvrTest() throws Exception{
@@ -44,11 +44,11 @@ public class ModContTest {
 	
 	
 	/**
-	 * °è¾à±â°£ º¯°æÇÏ±â
-	 * °è¾à±â°£ÀÌ º¯°æµÊ¿¡ µû¶ó °è¾àÁ¾·áÀÏÀÚ, ÃÑº¸Çè·áµµ º¯°æµÊ
-	 * @param contNo 	°è¾à¹øÈ£
-	 * @param contPrd	°è¾à±â°£
-	 * @return °è¾àÁ¤º¸
+	 * ê³„ì•½ìƒíƒœë³€ê²½
+	 * ê³„ì•½ê¸°ê°„ì´ ë³€ê²½ë¨ì— ë”°ë¼ ê³„ì•½ì¢…ë£Œì¼ì, ì´ë³´í—˜ë£Œë„ ë³€ê²½ë¨
+	 * @param contNo 	ê³„ì•½ë²ˆí˜¸
+	 * @param contStat	ê³„ì•½ìƒíƒœ
+	 * @return ê³„ì•½ì •ë³´
 	 */
 	@Test
 	void postContPrdTest() throws Exception{
@@ -61,11 +61,11 @@ public class ModContTest {
 	}
 	
 	/**
-	 * °è¾à»óÅÂº¯°æ
-	 * °è¾à±â°£ÀÌ º¯°æµÊ¿¡ µû¶ó °è¾àÁ¾·áÀÏÀÚ, ÃÑº¸Çè·áµµ º¯°æµÊ
-	 * @param contNo 	°è¾à¹øÈ£
-	 * @param contStat	°è¾à»óÅÂ
-	 * @return °è¾àÁ¤º¸
+	 * ê³„ì•½ìƒíƒœë³€ê²½
+	 * ê³„ì•½ê¸°ê°„ì´ ë³€ê²½ë¨ì— ë”°ë¼ ê³„ì•½ì¢…ë£Œì¼ì, ì´ë³´í—˜ë£Œë„ ë³€ê²½ë¨
+	 * @param contNo 	ê³„ì•½ë²ˆí˜¸
+	 * @param contStat	ê³„ì•½ìƒíƒœ
+	 * @return ê³„ì•½ì •ë³´
 	 */
 	@Test
 	void postContStatTest() throws Exception{
@@ -73,7 +73,7 @@ public class ModContTest {
 		mockMvc.perform(
 				post("/mod/stat")
 				.param("contNo", "P2022010900002")
-				.param("contStat", "Ã»¾àÃ¶È¸")
+				.param("contStat", "ì²­ì•½ì² íšŒ")
 		).andDo(print());
 	}
 	
