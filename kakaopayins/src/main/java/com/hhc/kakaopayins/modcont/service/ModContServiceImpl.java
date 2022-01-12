@@ -4,8 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-
-import javax.transaction.Transactional;
+import java.util.NoSuchElementException;
 
 import org.springframework.stereotype.Service;
 
@@ -41,7 +40,12 @@ public class ModContServiceImpl implements ModContService {
 		
 		ValidationUtil.chkDupCvrInfo(insCvr);	//중복입력여부 체크
 		
-		ContMst cm = modContRepository.findById(contNo).orElseThrow(null);
+		ContMst cm = modContRepository.findById(contNo).orElseThrow(() ->new KakaoException(ErrCode.E1002.getErrMsg(), ErrCode.E1002));
+		
+		if("기간만료".equals(cm.getContStat())){
+			throw new KakaoException(ErrCode.E1003.getErrMsg(), ErrCode.E1003);	//이미 기간이 만료된 계약입니다.
+		}
+		
 		cm.setInsCvr(insCvr);
 		cm.setTotInsPrem(CalculationUtil.calTotInsPrem(cm.getPrdtInfo(), insCvr, cm.getContPrd(), cvrInfoRepository));
 		return setHnglNm(modContRepository.save(cm));
@@ -57,7 +61,11 @@ public class ModContServiceImpl implements ModContService {
 	public ContMst modContPrd(String contNo, String contPrd) throws Exception {
 		
 		
-		ContMst cm = modContRepository.findById(contNo).orElseThrow(null);
+		ContMst cm = modContRepository.findById(contNo).orElseThrow(() ->new KakaoException(ErrCode.E1002.getErrMsg(), ErrCode.E1002));
+		if("기간만료".equals(cm.getContStat())){
+			throw new KakaoException(ErrCode.E1003.getErrMsg(), ErrCode.E1003);	//이미 기간이 만료된 계약입니다.
+		}
+		
 		cm.setContPrd(Integer.parseInt(contPrd));
 		
 		List<CvrInfo> cvrInfoList = cvrInfoRepository.findPrdtInfo(cm.getPrdtInfo());
@@ -85,7 +93,8 @@ public class ModContServiceImpl implements ModContService {
 	 */
 	@Override
 	public ContMst modContStat(String contNo, String contStat) {
-		ContMst cm = modContRepository.findById(contNo).orElseThrow(null);
+		ContMst cm = modContRepository.findById(contNo).orElseThrow(() ->new KakaoException(ErrCode.E1002.getErrMsg(), ErrCode.E1002));
+		
 		if("기간만료".equals(cm.getContStat())){
 			throw new KakaoException(ErrCode.E1003.getErrMsg(), ErrCode.E1003);	//이미 기간이 만료된 계약입니다.
 		}

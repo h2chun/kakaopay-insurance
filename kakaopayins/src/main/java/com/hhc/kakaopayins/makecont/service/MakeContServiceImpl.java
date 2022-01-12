@@ -6,8 +6,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import javax.transaction.Transactional;
-
 import org.springframework.stereotype.Service;
 
 import com.hhc.kakaopayins.global.entity.ContMst;
@@ -38,7 +36,6 @@ public class MakeContServiceImpl implements MakeContService{
 	}
 
 	@Override
-	@Transactional
 	public ContMst saveContMst(ContMst contMst){
 		/*
 		int idx = contNoInfoRepo.findMaxValue()+1;
