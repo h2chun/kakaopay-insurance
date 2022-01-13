@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -37,12 +38,12 @@ public class MakeContServiceImpl implements MakeContService{
 
 	@Override
 	public ContMst saveContMst(ContMst contMst){
-		/*
-		int idx = contNoInfoRepo.findMaxValue()+1;
-		String idxStr = String.format("%05d", idx);
 		
-		contNoInfoRepo.updateValue(idx);
-		*/
+		ValidationUtil.nullChkByPrdtInfo(contMst.getPrdtInfo());	//상품정보 null체크
+		ValidationUtil.nullChkByCvrInfo(contMst.getInsCvr());		//담보정보 null체크
+		ValidationUtil.nullChkByContPrd(contMst.getContPrd());		//계약기간 null체크
+		
+		ValidationUtil.chkContPrdNumeric(contMst.getContPrd()+"");	//계약기간이 숫자인지 체크
 		
 		ValidationUtil.chkDupCvrInfo(contMst.getInsCvr());	//중복입력여부 체크
 		

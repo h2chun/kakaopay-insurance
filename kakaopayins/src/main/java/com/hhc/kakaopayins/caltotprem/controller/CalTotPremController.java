@@ -18,7 +18,7 @@ public class CalTotPremController {
 	}
 
 	@GetMapping("/cal")
-	public BigDecimal dlngContMst(String prdtInfo, String insCvr, int contPrd) throws Exception {
+	public BigDecimal dlngContMst(String prdtInfo, String insCvr, String contPrd) throws Exception {
 		
 		BigDecimal rtn = service.calTotPrem(prdtInfo, insCvr, contPrd);
 		return rtn;

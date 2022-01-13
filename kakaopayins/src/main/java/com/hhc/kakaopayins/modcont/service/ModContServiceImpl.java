@@ -4,7 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -38,6 +38,9 @@ public class ModContServiceImpl implements ModContService {
 	@Override
 	public ContMst modInsCvr(String contNo, String insCvr) {
 		
+		ValidationUtil.nullChkByContNo(contNo);		//계약번호 null체크
+		ValidationUtil.nullChkByCvrInfo(insCvr);	//담보정보 null체크
+				
 		ValidationUtil.chkDupCvrInfo(insCvr);	//중복입력여부 체크
 		
 		ContMst cm = modContRepository.findById(contNo).orElseThrow(() ->new KakaoException(ErrCode.E1002.getErrMsg(), ErrCode.E1002));
@@ -60,6 +63,10 @@ public class ModContServiceImpl implements ModContService {
 	@Override
 	public ContMst modContPrd(String contNo, String contPrd) throws Exception {
 		
+		ValidationUtil.nullChkByContNo(contNo);		//계약번호 null체크
+		Optional.ofNullable(contPrd).orElseThrow(() -> new KakaoException(ErrCode.E1008.getErrMsg(), ErrCode.E1008) );	//계약기간 null체크
+		
+		ValidationUtil.chkContPrdNumeric(contPrd);	//계약기간이 숫자인지 체크
 		
 		ContMst cm = modContRepository.findById(contNo).orElseThrow(() ->new KakaoException(ErrCode.E1002.getErrMsg(), ErrCode.E1002));
 		if("기간만료".equals(cm.getContStat())){
@@ -93,6 +100,9 @@ public class ModContServiceImpl implements ModContService {
 	 */
 	@Override
 	public ContMst modContStat(String contNo, String contStat) {
+		
+		ValidationUtil.nullChkByContNo(contNo);		//계약번호 null체크
+		
 		ContMst cm = modContRepository.findById(contNo).orElseThrow(() ->new KakaoException(ErrCode.E1002.getErrMsg(), ErrCode.E1002));
 		
 		if("기간만료".equals(cm.getContStat())){

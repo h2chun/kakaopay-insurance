@@ -65,7 +65,7 @@ public class InqContServiceImpl implements InqContService {
 		}
 		
 		int len = inqList.size();
-		System.out.println("1.inqList.size()>>>>>"+inqList.size());
+		
 		for(int i = 0; i < len; i++) {
 			
 			
@@ -80,7 +80,6 @@ public class InqContServiceImpl implements InqContService {
 			inqList.get(i).setPrdtInfo(cvrInfo.getPrdtInfo().getPrdtNm());
 			inqList.get(i).setInsCvr(cvrNm.toString().substring(0, cvrNm.toString().length()-1));
 		}
-		System.out.println("2.inqList.size()>>>>>"+inqList.size());
 		
 		return inqList;
 	}

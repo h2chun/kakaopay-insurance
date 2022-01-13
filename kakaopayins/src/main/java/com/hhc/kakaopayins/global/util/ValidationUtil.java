@@ -2,6 +2,7 @@ package com.hhc.kakaopayins.global.util;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Optional;
 
 import com.hhc.kakaopayins.global.entity.CvrInfo;
 import com.hhc.kakaopayins.global.exception.ErrCode;
@@ -97,6 +98,55 @@ public class ValidationUtil {
 		int maxContPrd = cvrInfoList.get(0).getPrdtInfo().getMaxContPrd();
 		if(minContPrd > contPrd || contPrd > maxContPrd) {
 			throw new KakaoException(ErrCode.E1001.getErrMsg(), ErrCode.E1001);	//해당 상품에 계약기간을 확인바랍니다.
+		}
+	}
+	
+	/**
+	 * 담보정보 null체크
+	 * @param cvrInfo
+	 * @param 
+	 */
+	public static void nullChkByCvrInfo(String cvrInfo) {
+		Optional.ofNullable(cvrInfo).orElseThrow(() -> new KakaoException(ErrCode.E1006.getErrMsg(), ErrCode.E1006) );
+	}
+	
+	/**
+	 * 상품정보 null체크
+	 * @param prdtInfo
+	 * @param 
+	 */
+	public static void nullChkByPrdtInfo(String prdtInfo) {
+		Optional.ofNullable(prdtInfo).orElseThrow(() -> new KakaoException(ErrCode.E1007.getErrMsg(), ErrCode.E1007) );
+	}
+	
+	/**
+	 * 계약기간 null체크
+	 * @param contPrd
+	 * @param 
+	 */
+	public static void nullChkByContPrd(int contPrd) {
+		Optional.ofNullable(contPrd).orElseThrow(() -> new KakaoException(ErrCode.E1008.getErrMsg(), ErrCode.E1008) );
+	}
+	
+	/**
+	 * 계약번호 null체크
+	 * @param contNo
+	 * @param 
+	 */
+	public static void nullChkByContNo(String contNo) {
+		Optional.ofNullable(contNo).orElseThrow(() -> new KakaoException(ErrCode.E1009.getErrMsg(), ErrCode.E1009) );
+	}
+	
+	/**
+	 * 계약기간 숫자인지 체크
+	 * @param contPrd
+	 * @param 
+	 */
+	public static void chkContPrdNumeric(String contPrd) {
+		try {
+			Integer.parseInt(contPrd);
+		}catch (Exception e) {
+			throw new KakaoException(ErrCode.E1010.getErrMsg(), ErrCode.E1010);
 		}
 	}
 }
